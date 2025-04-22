@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
-import ChatView from './components/ChatView';
-import EditorView from './components/EditorView';
-import './styles/App.css';
+import ChatView from './components/chatView';
+import EditorView from './components/editorView';
+import './styles/app.css';
 
 function App() {
   return (

@@ -5,7 +5,8 @@ import 'react-quill/dist/quill.snow.css';
 import { pdfExporter } from 'quill-to-pdf';
 import { saveAs } from 'file-saver';
 import { generateWord } from 'quill-to-word';
-import '../styles/EditorView.css';
+import Header from './Header';
+import '../styles/editorView.css';
 
 const EditorView = () => {
   const [content, setContent] = useState('');
@@ -208,63 +209,64 @@ const EditorView = () => {
   };
 
   return (
-    <div className="container">
-      <div className="nav-container">
-        <button 
-          className="nav-button inactive" 
-          onClick={() => navigate('/')}
-        >
-          Chat
-        </button>
-        <button className="nav-button active">Editor</button>
-      </div>
-      
-      <div className="header">
-        <h1>ESGenerator - Editor</h1>
-      </div>
-      
-      <div className="editor-container">
-        <div className="quill-wrapper">
-          <ReactQuill
-            ref={quillRef}
-            theme="snow"
-            value={content}
-            onChange={handleContentChange}
-            modules={modules}
-            formats={formats}
-            placeholder="Write your ESRS report here..."
-          />
-        </div>
-        
-        <div className="editor-controls">
-          {downloadMessage && (
-            <div className={`save-message ${downloadMessage.includes('Error') || downloadMessage.includes('Cannot') ? 'error' : 'success'}`}>
-              {downloadMessage}
-            </div>
-          )}
-          
-          <div className="export-options">
-            <select 
-              className="format-selector" 
-              value={exportFormat} 
-              onChange={handleFormatChange}
-            >
-              <option value="pdf">PDF</option>
-              <option value="docx">Word Document (.docx)</option>
-              <option value="txt">Plain Text (.txt)</option>
-            </select>
-            
+    <>
+      <Header />
+      <div className="main-content">
+        <div className="container">
+          <div className="nav-container">
             <button 
-              className="save-button"
-              onClick={handleExport}
-              disabled={isDownloading}
+              className="nav-button inactive" 
+              onClick={() => navigate('/')}
             >
-              {isDownloading ? `Preparing ${exportFormat.toUpperCase()}...` : `Download ${exportFormat.toUpperCase()}`}
+              Chat
             </button>
+            <button className="nav-button active">Editor</button>
+          </div>
+          
+          <div className="editor-container">
+            <div className="quill-wrapper">
+              <ReactQuill
+                ref={quillRef}
+                theme="snow"
+                value={content}
+                onChange={handleContentChange}
+                modules={modules}
+                formats={formats}
+                placeholder="Write your ESRS report here..."
+              />
+            </div>
+            
+            <div className="editor-controls">
+              {downloadMessage && (
+                <div className={`save-message ${downloadMessage.includes('Error') || downloadMessage.includes('Cannot') ? 'error' : 'success'}`}>
+                  {downloadMessage}
+                </div>
+              )}
+              
+              <div className="export-options">
+                <select 
+                  className="format-selector" 
+                  value={exportFormat} 
+                  onChange={handleFormatChange}
+                >
+                  <option value="pdf">PDF</option>
+                  <option value="docx">Word Document (.docx)</option>
+                  <option value="txt">Plain Text (.txt)</option>
+                </select>
+                
+                <button 
+                  className="save-button"
+                  onClick={handleExport}
+                  disabled={isDownloading}
+                >
+                  {isDownloading ? `Preparing ${exportFormat.toUpperCase()}...` : `Download ${exportFormat.toUpperCase()}`}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

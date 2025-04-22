@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faRedo } from '@fortawesome/free-solid-svg-icons';
-import '../styles/ChatView.css';
+import Header from './Header';
+import '../styles/chatView.css';
 
 const ChatView = () => {
   const [messages, setMessages] = useState([
@@ -153,82 +154,81 @@ const ChatView = () => {
   };
 
   return (
-    <div className="container">
-      <div className="nav-container">
-        <button className="nav-button active">Chat</button>
-        <button 
-          className="nav-button inactive" 
-          onClick={() => navigate('/editor')}
-        >
-          Editor
-        </button>
-      </div>
-      
-      <div className="header">
-        <h1>ESGenerator</h1>
-      </div>
-      
-      {companyInfo.initialized && (
-        <div className="sub-header">
-          <div className="sector-info">
-            <div className="sector-box">
-              <h3>NACE Sector:</h3>
-              <p>{companyInfo.naceSector}</p>
-            </div>
-            <div className="sector-box">
-              <h3>Sector-specific Standards:</h3>
-              <p>{companyInfo.esrsSector}</p>
-            </div>
+    <>
+      <Header />
+      <div className="main-content">
+        <div className="container">
+          <div className="nav-container">
+            <button className="nav-button active">Chat</button>
             <button 
-              className="reset-button" 
-              title="Start new conversation"
-              onClick={handleReset}
+              className="nav-button inactive" 
+              onClick={() => navigate('/editor')}
             >
-              <FontAwesomeIcon icon={faRedo} /> New Chat
+              Editor
+            </button>
+          </div>
+          
+          {companyInfo.initialized && (
+            <div className="sub-header">
+              <div className="sector-info">
+                <div className="sector-box">
+                  <h3>NACE Sector:</h3>
+                  <p>{companyInfo.naceSector}</p>
+                </div>
+                <div className="sector-box">
+                  <h3>Sector-specific Standards:</h3>
+                  <p>{companyInfo.esrsSector}</p>
+                </div>
+                <button 
+                  className="reset-button" 
+                  title="Start new conversation"
+                  onClick={handleReset}
+                >
+                  <FontAwesomeIcon icon={faRedo} /> New Chat
+                </button>
+              </div>
+            </div>
+          )}
+          
+          <div className="chat-container" ref={chatContainerRef}>
+            {messages.map((message, index) => (
+              <div 
+                key={index} 
+                className={`message ${message.type}-message ${message.isWelcome ? 'welcome-message' : ''}`}
+                dangerouslySetInnerHTML={{ __html: message.content }}
+              />
+            ))}
+            
+            {isLoading && (
+              <div className="message bot-message loading">
+                <div className="loading-dots">
+                  <div className="dot"></div>
+                  <div className="dot"></div>
+                  <div className="dot"></div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="input-container">
+            <textarea
+              ref={textareaRef}
+              id="user-input"
+              value={inputValue}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              placeholder={placeholderText}
+              rows="1"
+            />
+            <button 
+              id="send-button"
+              onClick={handleSendMessage}
+            >
+              <FontAwesomeIcon icon={faPaperPlane} />
             </button>
           </div>
         </div>
-      )}
-      
-      <div className="chat-container" ref={chatContainerRef}>
-        {messages.map((message, index) => (
-          <div 
-            key={index} 
-            className={`message ${message.type}-message ${message.isWelcome ? 'welcome-message' : ''}`}
-            dangerouslySetInnerHTML={{ __html: message.content }}
-          />
-        ))}
-        
-        {isLoading && (
-          <div className="message bot-message loading">
-            <div className="loading-dots">
-              <div className="dot"></div>
-              <div className="dot"></div>
-              <div className="dot"></div>
-            </div>
-          </div>
-        )}
       </div>
-      
-      <div className="input-container">
-        <textarea
-          ref={textareaRef}
-          id="user-input"
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholderText}
-          rows="1"
-        />
-        <button 
-          id="send-button"
-          onClick={handleSendMessage}
-        >
-          <FontAwesomeIcon icon={faPaperPlane} />
-        </button>
-      </div>
-    </div>
+    </>
   );
 };
-
-export default ChatView;
