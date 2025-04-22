@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ESGenerator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="nav-container">
+            <button class="nav-button active">Chat</button>
+            <button class="nav-button inactive" onclick="window.location.href='/editor'">Editor</button>
+        </div>
+        <div class="header">
+            <h1>ESGenerator</h1>
+        </div>
+        <div class="sub-header" id="sub-header">
+            <div class="sector-info">
+                <div class="sector-box">
+                    <h3>NACE Sector:</h3>
+                    <p id="nace-sector">Not classified yet</p>
+                </div>
+                <div class="sector-box">
+                    <h3>Sector-specific Standards:</h3>
+                    <p id="esrs-sector">Not determined yet</p>
+                </div>
+                <button id="reset-button" title="Start new conversation"><i class="fas fa-redo"></i> New Chat</button>
+            </div>
+        </div>
+        <div class="chat-container" id="chat-container">
+            <div class="message bot-message welcome-message">
+                <h2>Welcome to ESGenerator</h2>
+                <p>Please provide a detailed description of your company's activities, products, services, and sector to help me determine the applicable ESRS reporting standards.</p>
+            </div>
+        </div>
+        <div class="input-container">
+            <textarea id="user-input" placeholder="Enter your company description..." rows="1"></textarea>
+            <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</body>
+</html>

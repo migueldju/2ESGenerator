@@ -1,0 +1,28 @@
+:root {
+    --primary-color: #2a66b3;
+    --accent-color: #3e8ed0;
+    --light-bg: #f5f7fa;
+    --dark-text: #333;
+    --light-text: #fff;
+    --border-color: #ddd;
+    --table-header-bg: #eef2f7;
+    --table-border: #ccd6e0;
+    --table-row-hover: #f0f5ff;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  body {
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    line-height: 1.6;
+  }
+  
+  button {
+    cursor: pointer;
+  }

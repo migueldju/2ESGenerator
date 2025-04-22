@@ -1,0 +1,188 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+  }
+
+  .header {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .header h1 {
+    color: #2c3e50;
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+  
+
+  .nav-container {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .nav-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .nav-button.active {
+    color: #3498db;
+    font-weight: bold;
+  }
+  
+  .nav-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #3498db;
+  }
+  
+  .nav-button.inactive {
+    color: #7f8c8d;
+  }
+  
+  .nav-button.inactive:hover {
+    color: #3498db;
+  }
+  
+  .editor-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  
+  .quill-wrapper {
+    min-height: 500px;
+    border-radius: 4px;
+  }
+  
+  .quill-wrapper .ql-container {
+    font-size: 16px;
+    min-height: 450px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+  
+  .quill-wrapper .ql-toolbar {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    background-color: #f8f9fa;
+  }
+  
+  .quill-wrapper .ql-editor {
+    min-height: 450px;
+    padding: 15px;
+    line-height: 1.6;
+  }
+  
+  .editor-controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 0;
+  }
+  
+  .save-button {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .save-button:hover {
+    background-color: #2980b9;
+  }
+  
+  .save-button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+  }
+  
+  .save-message {
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    animation: fadeOut 3s forwards;
+  }
+
+  .format-selector {
+    margin-right: 12px; 
+  }
+  
+  
+  .save-message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+  
+  .save-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  
+  @keyframes fadeOut {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      padding: 10px;
+    }
+    
+    .header h1 {
+      font-size: 24px;
+    }
+    
+    .quill-wrapper {
+      min-height: 350px;
+    }
+    
+    .quill-wrapper .ql-editor,
+    .quill-wrapper .ql-container {
+      min-height: 350px;
+    }
+  }
+
+  .ql-snow .ql-picker.ql-header .ql-picker-label::before,
+  .ql-snow .ql-picker.ql-header .ql-picker-item::before {
+    font-weight: bold;
+  }
+  
+  .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="1"]::before,
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="1"]::before {
+    font-size: 2em;
+  }
+  
+  .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="2"]::before,
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="2"]::before {
+    font-size: 1.5em;
+  }
+  
+  .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="3"]::before,
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="3"]::before {
+    font-size: 1.17em;
+  }

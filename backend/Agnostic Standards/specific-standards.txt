@@ -1,0 +1,4 @@
+only companies belonging to the following sector groups have to comply with sector specific standards, each group with its own standards:
+- Mining, Quarrying and Coal
+- Oil and Gas
+- Road Transport 
