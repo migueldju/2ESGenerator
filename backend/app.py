@@ -28,7 +28,7 @@ from models import db
 # Initialize Flask app
 app = Flask(__name__, static_folder='./build', template_folder='./build')
 app.config.from_object(get_config())
-app.config['MAIL_SENDGRID_API_KEY'] = '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'
+app.config['MAIL_SENDGRID_API_KEY'] = 'your_sendgrid_api_key_here'  # Replace with your SendGrid API key
 
 # Configure logging
 if not os.path.exists('logs'):
