@@ -19,3 +19,6 @@ email-validator
 pillow
 python-dateutil
 jinja2
+mysql-connector-python
+pymysql
+cryptography

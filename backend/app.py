@@ -25,12 +25,10 @@ from logging.handlers import RotatingFileHandler
 import hashlib
 from models import db
 
-# Initialize Flask app
 app = Flask(__name__, static_folder='./build', template_folder='./build')
 app.config.from_object(get_config())
-app.config['MAIL_SENDGRID_API_KEY'] = 'your_sendgrid_api_key_here'  # Replace with your SendGrid API key
+app.config['MAIL_SENDGRID_API_KEY'] = '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'
 
-# Configure logging
 if not os.path.exists('logs'):
     os.mkdir('logs')
 file_handler = RotatingFileHandler('logs/esrs_generator.log', maxBytes=10240, backupCount=10)
@@ -42,7 +40,6 @@ app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
 app.logger.info('ESGenerator startup')
 
-# Set up rate limiting
 limiter = Limiter(
     get_remote_address,
     app=app,
@@ -50,37 +47,32 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-allowed_origins = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:5173,http://localhost:3000').split(',')
+allowed_origins = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:5173')
 CORS(app, 
      resources={r"/*": {"origins": allowed_origins}}, 
      supports_credentials=True,
      allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
-# Update these session cookie settings
-app.config['SESSION_COOKIE_SAMESITE'] = None  # Required for cross-origin requests with credentials
-app.config['SESSION_COOKIE_SECURE'] = False   # Set to True in production with HTTPS
+app.config['SESSION_COOKIE_SAMESITE'] = None
+app.config['SESSION_COOKIE_SECURE'] = False   
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 
-# Initialize extensions
 db.init_app(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-# Initialize email service
+
 email_service = EmailService(app)
 
-# Suppress warnings
 warnings.filterwarnings("ignore")
 
-# Import models
 from models import User, Conversation, Answer, Document
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Get API key from environment variable instead of hardcoding
 api_key = os.environ.get('NVIDIA_API_KEY')
 if not api_key:
     api_key = "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"
@@ -110,10 +102,9 @@ def load_vectorstore(db_folder):
         app.logger.error(f"Error loading vectorstore: {str(e)}")
         raise
 
-# Initialize reranker
+
 reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L6-v2")
 
-# LLM response function
 def get_llm_response(prompt):
     try:
         completion = client.chat.completions.create(
@@ -135,12 +126,10 @@ def get_llm_response(prompt):
         app.logger.error(f"Error getting LLM response: {str(e)}")
         return "I'm sorry, I encountered an error processing your request. Please try again later."
 
-# Custom NvidiaLLM class
 class NvidiaLLM(Runnable):
     def invoke(self, input):
         return get_llm_response(input["query"])
 
-# Load chain function
 def load_chain(vectorstore):
     retriever = vectorstore.as_retriever(search_type="mmr", search_kwargs={"k": 10})
     return RetrievalQA.from_chain_type(
@@ -150,12 +139,10 @@ def load_chain(vectorstore):
         return_source_documents=True
     )
 
-# Load vectorstores
 try:
     nace_vs = load_vectorstore("nace_db")
     default_vs = load_vectorstore("default_db")
 
-    # Sector vectorstores
     sector_vectorstores = {}
     merged_vectorstores = {}
 
@@ -183,17 +170,15 @@ try:
 except Exception as e:
     app.logger.error(f"Error loading vector stores: {str(e)}")
 
-# Load sector classification
 try:
     with open("sector_classification.json", "r", encoding="utf-8") as f:
         special_sectors = json.load(f)
 except Exception as e:
     app.logger.error(f"Error loading sector classification: {str(e)}")
 
-# Initialize NACE chain
 nace_chain = load_chain(nace_vs)
 
-# Security helper functions
+
 def generate_csrf_token():
     """Generate a CSRF token for form protection"""
     if 'csrf_token' not in session:

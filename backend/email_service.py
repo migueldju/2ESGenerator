@@ -2,15 +2,19 @@ import smtplib
 import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import os
 from email.utils import formatdate
+from flask_mail_sendgrid import MailSendGrid
+from flask_mail import Message
+
 import ssl
 
 class EmailService:
     def __init__(self, app=None):
-        self.logger = logging.getLogger(__name__)
         if app:
+            self.logger = logging.getLogger(__name__)
             self.init_app(app)
+        self.mail = MailSendGrid(app)
+            
             
     def init_app(self, app):
         self.host = app.config.get('MAIL_SERVER')
@@ -21,50 +25,35 @@ class EmailService:
         self.use_ssl = app.config.get('MAIL_USE_SSL', False)
         self.sender = app.config.get('MAIL_DEFAULT_SENDER')
         
-        # Log configuration but hide sensitive data
+        self.sendgrid_api_key = app.config.get('MAIL_SENDGRID_API_KEY')
+        
+        if self.host == 'smtp.sendgrid.net' and self.sendgrid_api_key:
+            self.username = 'apikey'
+            self.password = self.sendgrid_api_key
+
         self.logger.info(f"Email service configured with server: {self.host}:{self.port}")
         self.logger.info(f"Email TLS: {self.use_tls}, SSL: {self.use_ssl}")
+        self.logger.info(f"Using SendGrid: {self.host == 'smtp.sendgrid.net'}")
         
-        # Check if email is properly configured
-        self.email_enabled = bool(self.host and self.port)
+        self.email_enabled = bool(self.host and self.port and (
+            (self.username and self.password) or 
+            (self.host != 'smtp.sendgrid.net')
+        ))
+        
         if not self.email_enabled:
             self.logger.warning("Email service not fully configured - emails will be logged but not sent")
-
-    # Then modify the send_email method
+            
     def send_email(self, to, subject, template):
         """Send an email with proper security settings"""
         try:
             # Create email message
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = subject
-            msg['From'] = self.sender
-            msg['To'] = to
-            msg['Date'] = formatdate(localtime=True)
-            
-            msg.attach(MIMEText(template, 'html'))
-            
-            # If email is not configured, just log it
-            if not getattr(self, 'email_enabled', False):
-                self.logger.info(f"Email would be sent to {to} with subject '{subject}'")
-                self.logger.info(f"Email content: {template[:100]}...")
-                return True
-                
-            # Otherwise, send it
-            context = ssl.create_default_context()
-            
-            if self.use_ssl:
-                server = smtplib.SMTP_SSL(self.host, self.port, context=context)
-            else:
-                server = smtplib.SMTP(self.host, self.port)
-                if self.use_tls:
-                    server.starttls(context=context)
-            
-            if self.username and self.password:
-                server.login(self.username, self.password)
-                
-            server.sendmail(self.sender, to, msg.as_string())
-            server.quit()
-            
+            msg = Message("Hello",
+            sender="from@example.com",
+            mail_options={'from_name': 'John'},
+            recipients=[to])
+            msg.html = template
+            msg.subject = subject
+            self.mail.send(msg)
             self.logger.info(f"Email sent successfully to {to}")
             return True
         except Exception as e:
