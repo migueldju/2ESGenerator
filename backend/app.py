@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, session, send_from_d
 from flask_cors import CORS
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail_sendgrid import MailSendGrid
 import os
 import json
 import re
@@ -27,6 +28,7 @@ from models import db
 # Initialize Flask app
 app = Flask(__name__, static_folder='./build', template_folder='./build')
 app.config.from_object(get_config())
+app.config['MAIL_SENDGRID_API_KEY'] = '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'
 
 # Configure logging
 if not os.path.exists('logs'):
@@ -39,13 +41,6 @@ file_handler.setLevel(logging.INFO)
 app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
 app.logger.info('ESGenerator startup')
-
-app.config['MAIL_SERVER']='sandbox.smtp.mailtrap.io'
-app.config['MAIL_PORT'] = 2525
-app.config['MAIL_USERNAME'] = 'c81c2792d9309e'
-app.config['MAIL_PASSWORD'] = '****ae74'
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
 
 # Set up rate limiting
 limiter = Limiter(

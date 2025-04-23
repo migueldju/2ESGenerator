@@ -2,6 +2,7 @@ flask
 flask-cors
 flask-limiter
 flask-login
+flask_mail_sendgrid
 flask-sqlalchemy
 werkzeug
 python-dotenv

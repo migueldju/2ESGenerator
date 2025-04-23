@@ -172,23 +172,111 @@
   .bot-message .action-plan-table td:first-child {
     font-weight: 600;
   }
+
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
   
+  .container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  .nav-container {
+    padding: 15px 0;
+  }
+  
+  .chat-container {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    min-height: 300px; /* Minimum height for smaller screens */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .input-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  #user-input {
+    flex: 1;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    resize: none;
+    max-height: 150px;
+    min-height: 50px;
+    outline: none;
+  }
+  
+  #user-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(42, 102, 179, 0.2);
+  }
+  
+  #send-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  #send-button:hover:not(:disabled) {
+    background-color: var(--accent-color);
+  }
+  
+  #send-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Optimize for mobile */
   @media (max-width: 768px) {
-    .message {
-      max-width: 90%;
+    .container {
+      padding: 0 10px;
     }
     
     .sector-info {
       flex-direction: column;
       gap: 10px;
     }
-    
-    .bot-message table {
-      font-size: 0.8rem;
+
+    .message {
+      max-width: 90%;
     }
     
-    .bot-message th, 
-    .bot-message td {
-      padding: 0.5rem;
+    .sector-box {
+      width: 100%;
+    }
+    
+    #user-input {
+      font-size: 16px; /* Prevent zoom on mobile */
+    }
+    
+    #send-button {
+      padding: 12px 15px;
     }
   }
+  

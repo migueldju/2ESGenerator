@@ -1,12 +1,13 @@
-// Updated App.jsx with proper imports and error handling
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ChatView from './components/chatView';
 import EditorView from './components/editorView';
-// Import directly instead of using lazy loading for now
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
+import ForgotPasswordPage from './components/ForgotPasswordPage';
+import ResetPasswordPage from './components/ResetPasswordPage';
 import './styles/app.css';
+
 
 // Fallback component for loading state
 const LoadingFallback = () => (
@@ -30,6 +31,8 @@ function App() {
         <Route path="/editor" element={<EditorView />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
       </Routes>
     </Suspense>
   );
