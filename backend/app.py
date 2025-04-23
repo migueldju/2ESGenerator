@@ -27,7 +27,6 @@ from models import db
 
 app = Flask(__name__, static_folder='./build', template_folder='./build')
 app.config.from_object(get_config())
-app.config['MAIL_SENDGRID_API_KEY'] = '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'
 
 if not os.path.exists('logs'):
     os.mkdir('logs')

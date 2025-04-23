@@ -72,3 +72,18 @@ RuntimeError: The current Flask app is not registered with this 'SQLAlchemy' ins
 2025-04-23 17:45:48,119 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
 2025-04-23 17:46:22,931 ERROR: Registration error: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on 'localhost' ([WinError 10061] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión)")
 (Background on this error at: https://sqlalche.me/e/20/e3q8) [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:342]
+2025-04-23 18:47:39,883 INFO: Chat message received. Session initialized: False [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:207]
+2025-04-23 18:47:53,114 INFO: Chat message received. Session initialized: True [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:207]
+2025-04-23 18:49:29,145 INFO: Chat message received. Session initialized: True [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:207]
+2025-04-23 18:57:01,682 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
+2025-04-23 19:56:16,707 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
+2025-04-23 19:56:37,836 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
+2025-04-23 19:57:33,104 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
+2025-04-23 19:57:42,223 INFO: Chat message received. Session initialized: False [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:206]
+2025-04-23 19:57:57,279 ERROR: Registration error: (pymysql.err.ProgrammingError) (1146, "Table 'esrs_db.users' doesn't exist")
+[SQL: SELECT users.id AS users_id, users.username AS users_username, users.email AS users_email, users.password AS users_password, users.is_verified AS users_is_verified, users.verification_token AS users_verification_token, users.reset_token AS users_reset_token, users.reset_token_expiry AS users_reset_token_expiry, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'email_1': 'mikewazowski939@gmail.com', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:341]
