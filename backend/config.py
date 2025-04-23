@@ -26,6 +26,18 @@ class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
     
+    # Email configuration for development - uses Python's debugging server
+    MAIL_SERVER = 'sandbox.smtp.mailtrap.io'
+    MAIL_PORT = 2525
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = 'c81c2792d9309e'
+    MAIL_PASSWORD = '5345dcfe0bae74'
+    MAIL_DEFAULT_SENDER = 'ESGenerator <noreply@esrs-generator.com>'
+    
+    # Set this to True if you want to actually log emails instead of sending
+    EMAIL_SUPPRESS_SEND = False
+    
 class TestingConfig(Config):
     """Testing configuration."""
     TESTING = True

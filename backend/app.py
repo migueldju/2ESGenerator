@@ -1,8 +1,7 @@
-from flask import Flask, render_template, request, jsonify, session, send_from_directory, url_for, redirect
+from flask import Flask, render_template, request, jsonify, session, send_from_directory, url_for
 from flask_cors import CORS
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import json
 import re
@@ -23,6 +22,7 @@ from flask_limiter.util import get_remote_address
 import logging
 from logging.handlers import RotatingFileHandler
 import hashlib
+from models import db
 
 # Initialize Flask app
 app = Flask(__name__, static_folder='./build', template_folder='./build')
@@ -40,29 +40,38 @@ app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
 app.logger.info('ESGenerator startup')
 
+app.config['MAIL_SERVER']='sandbox.smtp.mailtrap.io'
+app.config['MAIL_PORT'] = 2525
+app.config['MAIL_USERNAME'] = 'c81c2792d9309e'
+app.config['MAIL_PASSWORD'] = '****ae74'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+
 # Set up rate limiting
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"],
+    default_limits=["20000 per day", "5000 per hour"],
     storage_uri="memory://",
 )
 
-# Enable CORS with proper configuration
 allowed_origins = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:5173,http://localhost:3000').split(',')
-CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
+CORS(app, 
+     resources={r"/*": {"origins": allowed_origins}}, 
+     supports_credentials=True,
+     allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
-# Set session cookie settings - improve security
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Changed from None to Lax for better security
-app.config['SESSION_COOKIE_SECURE'] = True
+# Update these session cookie settings
+app.config['SESSION_COOKIE_SAMESITE'] = None  # Required for cross-origin requests with credentials
+app.config['SESSION_COOKIE_SECURE'] = False   # Set to True in production with HTTPS
 app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)  # Limit session lifetime
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 
 # Initialize extensions
-db = SQLAlchemy(app)
+db.init_app(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-
 # Initialize email service
 email_service = EmailService(app)
 
@@ -232,7 +241,6 @@ def chat():
         
         session.modified = True
         
-        # If user is authenticated, save the conversation
         if current_user.is_authenticated:
             conversation = Conversation(
                 user_id=current_user.id,
@@ -298,53 +306,61 @@ def reset_session():
 
 # Authentication routes
 @app.route('/register', methods=['POST'])
-@limiter.limit("10 per hour")
+@limiter.exempt  # Exempt from rate limiting for development
 def register():
-    data = request.json
-    
-    if not data or not data.get('username') or not data.get('email') or not data.get('password'):
-        return jsonify({'message': 'Missing required fields'}), 400
-    
-    # Validate email format
-    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    if not re.match(email_pattern, data['email']):
-        return jsonify({'message': 'Invalid email format'}), 400
-    
-    # Password strength check
-    if len(data['password']) < 8:
-        return jsonify({'message': 'Password must be at least 8 characters long'}), 400
-    
-    # Check if user with email already exists
-    if User.query.filter_by(email=data['email']).first():
-        app.logger.info(f"Registration attempt with existing email: {data['email']}")
-        return jsonify({'message': 'Email already registered'}), 400
-    
-    # Check if username is taken
-    if User.query.filter_by(username=data['username']).first():
-        return jsonify({'message': 'Username already taken'}), 400
-    
-    # Create new user
-    user = User(
-        username=data['username'],
-        email=data['email']
-    )
-    
-    # Set password
-    user.set_password(data['password'])
-    
-    # Generate verification token
-    user.verification_token = str(uuid.uuid4())
-    
-    # Save user to database
-    db.session.add(user)
-    db.session.commit()
-    
-    # Send verification email
-    verification_url = url_for('verify_email', token=user.verification_token, _external=True)
-    email_service.send_verification_email(user, verification_url)
-    
-    app.logger.info(f"New user registered: {user.username}")
-    return jsonify({'message': 'User registered successfully. Please check your email to verify your account.'}), 201
+    try:
+        data = request.json
+        
+        if not data or not data.get('username') or not data.get('email') or not data.get('password'):
+            return jsonify({'message': 'Missing required fields'}), 400
+        
+        # Validate email format
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, data['email']):
+            return jsonify({'message': 'Invalid email format'}), 400
+        
+        # Password strength check
+        if len(data['password']) < 8:
+            return jsonify({'message': 'Password must be at least 8 characters long'}), 400
+        
+        # Check if user with email already exists
+        if User.query.filter_by(email=data['email']).first():
+            app.logger.info(f"Registration attempt with existing email: {data['email']}")
+            return jsonify({'message': 'Email already registered'}), 400
+        
+        # Check if username is taken
+        if User.query.filter_by(username=data['username']).first():
+            return jsonify({'message': 'Username already taken'}), 400
+        
+        # Create new user
+        user = User(
+            username=data['username'],
+            email=data['email']
+        )
+        
+        # Set password
+        user.set_password(data['password'])
+        
+        # Generate verification token
+        user.verification_token = str(uuid.uuid4())
+        
+        # Save user to database
+        db.session.add(user)
+        db.session.commit()
+        
+        # Send verification email
+        try:
+            verification_url = url_for('verify_email', token=user.verification_token, _external=True)
+            email_service.send_verification_email(user, verification_url)
+        except Exception as email_error:
+            app.logger.warning(f"Failed to send verification email: {str(email_error)}")
+            # Continue registration process even if email fails
+        
+        app.logger.info(f"New user registered: {user.username}")
+        return jsonify({'message': 'User registered successfully. Please check your email to verify your account.'}), 201
+    except Exception as e:
+        app.logger.error(f"Registration error: {str(e)}")
+        return jsonify({'message': 'An error occurred. Please try again.'}), 500
 
 @app.route('/verify-email/<token>', methods=['GET'])
 def verify_email(token):
@@ -362,38 +378,42 @@ def verify_email(token):
     return jsonify({'message': 'Email verified successfully. You can now log in.'}), 200
 
 @app.route('/login', methods=['POST'])
-@limiter.limit("10 per minute")
+@limiter.exempt  # Exempt from rate limiting for development
 def login():
-    data = request.json
-    
-    if not data or not data.get('email') or not data.get('password'):
-        return jsonify({'message': 'Missing email or password'}), 400
-    
-    user = User.query.filter_by(email=data['email']).first()
-    
-    # Always take the same time to respond whether user exists or not (to prevent timing attacks)
-    if not user or not user.check_password(data['password']):
-        app.logger.warning(f"Failed login attempt for email: {data.get('email')}")
-        return jsonify({'message': 'Invalid email or password'}), 401
-    
-    if not user.is_verified:
-        return jsonify({'message': 'Please verify your email before logging in'}), 401
-    
-    # Log in user
-    login_user(user)
-    
-    # Regenerate session to prevent session fixation
-    session.regenerate()
-    
-    app.logger.info(f"User logged in: {user.username}")
-    return jsonify({
-        'message': 'Login successful',
-        'user': {
-            'id': user.id,
-            'username': user.username,
-            'email': user.email
-        }
-    }), 200
+    try:
+        data = request.json
+        
+        if not data or not data.get('email') or not data.get('password'):
+            return jsonify({'message': 'Missing email or password'}), 400
+        
+        user = User.query.filter_by(email=data['email']).first()
+        
+        # Always take the same time to respond whether user exists or not (to prevent timing attacks)
+        if not user or not user.check_password(data['password']):
+            app.logger.warning(f"Failed login attempt for email: {data.get('email')}")
+            return jsonify({'message': 'Invalid email or password'}), 401
+        
+        if not user.is_verified:
+            return jsonify({'message': 'Please verify your email before logging in'}), 401
+        
+        # Log in user
+        login_user(user)
+        
+        # Regenerate session to prevent session fixation
+        session.regenerate()
+        
+        app.logger.info(f"User logged in: {user.username}")
+        return jsonify({
+            'message': 'Login successful',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email
+            }
+        }), 200
+    except Exception as e:
+        app.logger.error(f"Login error: {str(e)}")
+        return jsonify({'message': 'An error occurred. Please try again.'}), 500
 
 @app.route('/logout', methods=['POST'])
 @login_required
@@ -417,7 +437,7 @@ def check_auth():
         return jsonify({'isAuthenticated': False}), 200
 
 @app.route('/forgot-password', methods=['POST'])
-@limiter.limit("5 per hour")
+# @limiter.limit("5 per hour")
 def forgot_password():
     data = request.json
     
@@ -455,7 +475,7 @@ def reset_password_page(token):
     return render_template('reset_password.html', token=token, csrf_token=generate_csrf_token())
 
 @app.route('/reset-password', methods=['POST'])
-@limiter.limit("5 per hour")
+# @limiter.limit("5 per hour")
 def reset_password():
     data = request.json
     
@@ -618,3 +638,111 @@ def delete_document(document_id):
     
     app.logger.info(f"Document deleted by user {current_user.id}: {document_id}")
     return jsonify({'message': 'Document deleted successfully'}), 200
+
+def process_company_description(company_desc):
+    retrieved_docs = nace_vs.similarity_search(company_desc, k=3)
+    
+    ranked_docs = sorted(
+        retrieved_docs,
+        key=lambda doc: reranker.predict([(company_desc, doc.page_content)]),
+        reverse=True
+    )[:3]
+    
+    context = "\n".join([doc.page_content for doc in ranked_docs])
+    
+    contextual_query = f"""
+    You are a NACE classification assistant.
+    Your job is to identify and return the exact NACE code.
+
+    Instructions:
+    - Analyze the company description.
+    - Use the context provided for reference.
+    - Respond with ONLY the NACE code (e.g., 'A01.1' or 'B05').
+    - Don't forget to include the letter
+
+    Company description:
+    {company_desc}
+
+    Context:
+    {context}
+    """
+    
+    nace_result = get_llm_response(contextual_query)
+    
+    nace_result = re.sub(r'(\b[a-u]\b)', lambda m: m.group(1).upper(), nace_result)
+    nace_result = re.sub(r'\.\s+', '.', nace_result)
+    
+    match = re.search(r'([A-U](\d{1,2})(\.\d{1,2}){0,2})', nace_result)
+    
+    if match:
+        nace_sector = match.group(1)
+        print(f"Company sector according to NACE: {nace_sector}") 
+        esrs_sector = special_sectors.get(nace_sector, "Agnostic")
+    else:
+        nace_sector = "Agnostic"
+        print("Could not determine exact NACE code. Using agnostic standards.") 
+        esrs_sector = "Agnostic"
+    
+    return {
+        'nace_sector': nace_sector,
+        'esrs_sector': esrs_sector
+    }
+
+def process_question(question):
+    company_desc = session.get('company_desc', '')
+    nace_sector = session.get('nace_sector', 'agnostic')
+    esrs_sector = session.get('esrs_sector', 'Agnostic')
+    conversation_history = session.get('conversation_history', [])
+    
+    qa_vs = default_vs
+    
+    if esrs_sector in sector_db_map:
+        merged_data = merged_vectorstores.get(esrs_sector)
+        
+        if merged_data:
+            qa_vs = merged_data['vectorstore']
+    
+    retrieved_docs = qa_vs.similarity_search(question, k=10)
+    
+    ranked_docs = sorted(
+        retrieved_docs,
+        key=lambda doc: reranker.predict([(question, doc.page_content)]),
+        reverse=True
+    )[:5]
+    
+    context = "\n".join([doc.page_content for doc in ranked_docs])
+    
+    contextual_query = f"""
+    Instructions:
+    - Follow the ESRS standards.
+    - Use the context provided for reference.
+    - No need to include summary tables
+    - Answer must be complete and accurate
+    - Give brief and concise answers
+    - Prioritize information quality over aesthetics
+    - Don't show tables, only plain text
+    - Don't say what was provided in context
+    - Give answer in markdown format
+    - Don't include numeric lists, only bullet points
+    Question: {question}
+    Context:
+    {context}
+    Take into account the previous conversation:
+    {conversation_history}
+    """
+    
+    answer = get_llm_response(contextual_query)
+    answer = markdown.markdown(answer, extensions=['tables', 'md_in_html'])
+    
+    conversation_history.append(f"Q: {question}")
+    conversation_history.append(f"A: {answer}")
+    session['conversation_history'] = conversation_history
+    
+    return jsonify({
+        'answer': answer,
+        'context': context,
+        'is_first_message': False
+    })
+
+if __name__ == '__main__':
+    app.run(debug=True, use_reloader=False)

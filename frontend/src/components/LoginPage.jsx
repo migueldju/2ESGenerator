@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import Header from './Header';
 import '../styles/AuthPages.css';
 
 const LoginPage = () => {
@@ -10,7 +11,16 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check for success message from registration
+    if (location.state && location.state.message) {
+      setSuccessMessage(location.state.message);
+    }
+  }, [location]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,6 +58,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError('');
+    setSuccessMessage('');
     
     if (!validateForm()) {
       return;
@@ -56,7 +67,7 @@ const LoginPage = () => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch('/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -65,15 +76,25 @@ const LoginPage = () => {
         credentials: 'include'
       });
       
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Login failed');
+        }
+        
+        // Login successful
+        navigate('/');
+      } else {
+        // Not JSON, log the text for debugging
+        const text = await response.text();
+        console.error("Received non-JSON response:", text);
+        throw new Error('Server returned an unexpected response format. Please try again later.');
       }
-      
-      // Login successful
-      navigate('/');
     } catch (error) {
+      console.error("Login error:", error);
       setLoginError(error.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
@@ -81,61 +102,70 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Log In</h2>
-        <p className="auth-subtitle">Welcome back! Please login to your account.</p>
-        
-        {loginError && (
-          <div className="auth-error-message">
-            {loginError}
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              className={errors.email ? 'error' : ''}
-            />
-            {errors.email && <span className="error-text">{errors.email}</span>}
-          </div>
+    <div className="app-container">
+      <Header />
+      <div className="auth-container">
+        <div className="auth-card">
+          <h2>Log In</h2>
+          <p className="auth-subtitle">Welcome back! Please login to your account.</p>
           
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              className={errors.password ? 'error' : ''}
-            />
-            {errors.password && <span className="error-text">{errors.password}</span>}
-          </div>
+          {successMessage && (
+            <div className="auth-success-message">
+              {successMessage}
+            </div>
+          )}
           
-          <div className="auth-links">
-            <Link to="/forgot-password" className="forgot-password">Forgot password?</Link>
-          </div>
+          {loginError && (
+            <div className="auth-error-message">
+              {loginError}
+            </div>
+          )}
           
-          <button 
-            type="submit" 
-            className="auth-button"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Logging in...' : 'Log In'}
-          </button>
-        </form>
-        
-        <div className="auth-footer">
-          Don't have an account? <Link to="/register">Register now</Link>
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+                className={errors.email ? 'error' : ''}
+              />
+              {errors.email && <span className="error-text">{errors.email}</span>}
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                className={errors.password ? 'error' : ''}
+              />
+              {errors.password && <span className="error-text">{errors.password}</span>}
+            </div>
+            
+            <div className="auth-links">
+              <Link to="/forgot-password" className="forgot-password">Forgot password?</Link>
+            </div>
+            
+            <button 
+              type="submit" 
+              className="auth-button"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Logging in...' : 'Log In'}
+            </button>
+          </form>
+          
+          <div className="auth-footer">
+            Don't have an account? <Link to="/register">Register now</Link>
+          </div>
         </div>
       </div>
     </div>

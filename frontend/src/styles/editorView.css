@@ -34,7 +34,7 @@
   }
   
   .nav-button.active {
-    color: #3498db;
+    color: #2a66b3;
     font-weight: bold;
   }
   
@@ -45,7 +45,7 @@
     left: 0;
     width: 100%;
     height: 3px;
-    background-color: #3498db;
+    background-color: #2a66b3;
   }
   
   .nav-button.inactive {
@@ -53,7 +53,7 @@
   }
   
   .nav-button.inactive:hover {
-    color: #3498db;
+    color: #2a66b3;
   }
   
   .editor-container {
@@ -100,7 +100,7 @@
   
   .save-button {
     padding: 10px 20px;
-    background-color: #3498db;
+    background-color: #2a66b3;
     color: white;
     border: none;
     border-radius: 4px;
@@ -110,7 +110,7 @@
   }
   
   .save-button:hover {
-    background-color: #2980b9;
+    background-color: #2a66b3;
   }
   
   .save-button:disabled {

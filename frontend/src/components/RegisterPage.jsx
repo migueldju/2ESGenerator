@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import Header from './Header';
 import '../styles/AuthPages.css';
 
 const RegisterPage = () => {
@@ -47,8 +48,8 @@ const RegisterPage = () => {
     
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
     }
     
     if (formData.password !== formData.confirmPassword) {
@@ -70,7 +71,8 @@ const RegisterPage = () => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/register', {
+      // Use the direct backend URL for now
+      const response = await fetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -79,18 +81,31 @@ const RegisterPage = () => {
           username: formData.username,
           email: formData.email,
           password: formData.password
-        })
+        }),
+        credentials: 'include'
       });
       
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Registration failed');
+        }
+        
+        // Registration successful
+        navigate('/login', { 
+          state: { message: 'Registration successful! Please check your email to verify your account.' } 
+        });
+      } else {
+        // Not JSON, log the text for debugging
+        const text = await response.text();
+        console.error("Received non-JSON response:", text);
+        throw new Error('Server returned an unexpected response format. Please try again later.');
       }
-      
-      // Registration successful
-      navigate('/login', { state: { message: 'Registration successful! Please check your email to verify your account.' } });
     } catch (error) {
+      console.error("Registration error:", error);
       setRegisterError(error.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
@@ -98,85 +113,88 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Create Account</h2>
-        <p className="auth-subtitle">Create a new account to start using ESGenerator</p>
-        
-        {registerError && (
-          <div className="auth-error-message">
-            {registerError}
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Choose a username"
-              className={errors.username ? 'error' : ''}
-            />
-            {errors.username && <span className="error-text">{errors.username}</span>}
-          </div>
+    <div className="app-container">
+      <Header />
+      <div className="auth-container">
+        <div className="auth-card">
+          <h2>Create Account</h2>
+          <p className="auth-subtitle">Create a new account to start using ESGenerator</p>
           
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              className={errors.email ? 'error' : ''}
-            />
-            {errors.email && <span className="error-text">{errors.email}</span>}
-          </div>
+          {registerError && (
+            <div className="auth-error-message">
+              {registerError}
+            </div>
+          )}
           
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Create a password"
-              className={errors.password ? 'error' : ''}
-            />
-            {errors.password && <span className="error-text">{errors.password}</span>}
-          </div>
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="form-group">
+              <label htmlFor="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                placeholder="Choose a username"
+                className={errors.username ? 'error' : ''}
+              />
+              {errors.username && <span className="error-text">{errors.username}</span>}
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+                className={errors.email ? 'error' : ''}
+              />
+              {errors.email && <span className="error-text">{errors.email}</span>}
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Create a password"
+                className={errors.password ? 'error' : ''}
+              />
+              {errors.password && <span className="error-text">{errors.password}</span>}
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="confirmPassword">Confirm Password</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm your password"
+                className={errors.confirmPassword ? 'error' : ''}
+              />
+              {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
+            </div>
+            
+            <button 
+              type="submit" 
+              className="auth-button"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Creating Account...' : 'Register'}
+            </button>
+          </form>
           
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm your password"
-              className={errors.confirmPassword ? 'error' : ''}
-            />
-            {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
+          <div className="auth-footer">
+            Already have an account? <Link to="/login">Login here</Link>
           </div>
-          
-          <button 
-            type="submit" 
-            className="auth-button"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Creating Account...' : 'Register'}
-          </button>
-        </form>
-        
-        <div className="auth-footer">
-          Already have an account? <Link to="/login">Login here</Link>
         </div>
       </div>
     </div>

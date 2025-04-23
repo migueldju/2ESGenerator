@@ -1,3 +1,6 @@
+// Update ChatView component to better handle height and layout
+// src/components/chatView.jsx
+
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
@@ -28,14 +31,17 @@ const ChatView = () => {
   const navigate = useNavigate();
 
   const [placeholderText, setPlaceholder] = useState("Enter your company description...");
+  const [companyDesc, setCompanyDesc] = useState('');
+  const [conversationHistory, setConversationHistory] = useState([]);
 
-
+  // Scroll to bottom when messages change
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
+  // Adjust textarea height automatically
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -43,12 +49,40 @@ const ChatView = () => {
       
       if (textareaRef.current.scrollHeight > 150) {
         textareaRef.current.style.overflowY = 'scroll';
+        textareaRef.current.style.height = '150px';
       } else {
         textareaRef.current.style.overflowY = 'hidden';
       }
     }
   }, [inputValue]);
 
+  // Check for existing session on component mount
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch('/api/check_session', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.initialized) {
+            setCompanyInfo({
+              initialized: true,
+              naceSector: data.nace_sector,
+              esrsSector: data.esrs_sector
+            });
+            setPlaceholder("Ask your question here...");
+          }
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+      }
+    };
+    
+    checkSession();
+  }, []);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -60,79 +94,59 @@ const ChatView = () => {
       handleSendMessage();
     }
   };
-
-  const [companyDesc, setCompanyDesc] = useState('');
-  const [conversationHistory, setConversationHistory] = useState([]);
   
   const handleSendMessage = async () => {
-      if (!inputValue.trim()) return;
+    if (!inputValue.trim()) return;
   
-      setMessages(prev => [...prev, { type: 'user', content: inputValue }]);
+    setMessages(prev => [...prev, { type: 'user', content: inputValue }]);
+    
+    const currentInput = inputValue;
+    setInputValue('');
+    
+    setIsLoading(true);
+  
+    try {
+      const formData = new FormData();
+      formData.append('message', currentInput);
       
-      const currentInput = inputValue;
-      setInputValue('');
-      
-      setIsLoading(true);
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
   
-      try {
-          const formData = new FormData();
-          formData.append('message', currentInput);
-          
-          if (companyInfo.initialized) {
-              formData.append('company_desc', companyDesc);
-              formData.append('nace_sector', companyInfo.naceSector);
-              formData.append('esrs_sector', companyInfo.esrsSector);
-              formData.append('conversation_history', JSON.stringify(conversationHistory));
-          }
+      const data = await response.json();
   
-          const response = await fetch('http://localhost:5000/chat', {
-              method: 'POST',
-              body: formData,
-              credentials: 'include'
-          });
+      if (data.is_first_message) {
+        setCompanyInfo({
+          initialized: true,
+          naceSector: data.nace_sector,
+          esrsSector: data.esrs_sector
+        });
+        setCompanyDesc(currentInput);
+        setPlaceholder("Ask your question here...");
+      } 
   
-          const data = await response.json();
-  
-          if (data.is_first_message) {
-              setCompanyInfo({
-                  initialized: true,
-                  naceSector: data.nace_sector,
-                  esrsSector: data.esrs_sector
-              });
-              setCompanyDesc(data.company_desc);
-              setConversationHistory(data.conversation_history);
-              setPlaceholder("Ask your question here...");
-          } else {
-              if (data.conversation_history) {
-                  setConversationHistory(data.conversation_history);
-              }
-          }
-  
-          setMessages(prev => [...prev, { type: 'bot', content: data.answer }]);
-      } catch (error) {
-          console.error('Error:', error);
-          setMessages(prev => [...prev, { 
-              type: 'bot', 
-              content: "I'm sorry, there was an error processing your request. Please try again." 
-          }]);
-      } finally {
-          setIsLoading(false);
-      }
+      setMessages(prev => [...prev, { type: 'bot', content: data.answer }]);
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(prev => [...prev, { 
+        type: 'bot', 
+        content: "I'm sorry, there was an error processing your request. Please try again." 
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleReset = async () => {
     try {
-      const response = await fetch('/reset', {
+      const response = await fetch('/api/reset', {
         method: 'POST',
+        credentials: 'include'
       });
       
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      
-      const data = await response.json();
-      
-      if (data.status === 'success') {
+      if (response.ok) {
         setMessages([
           {
             type: 'bot',
@@ -147,6 +161,7 @@ const ChatView = () => {
           naceSector: 'Not classified yet',
           esrsSector: 'Not determined yet'
         });
+        setPlaceholder("Enter your company description...");
       }
     } catch (error) {
       console.error('Error resetting chat:', error);
@@ -154,7 +169,7 @@ const ChatView = () => {
   };
 
   return (
-    <>
+    <div className="app-container">
       <Header />
       <div className="main-content">
         <div className="container">
@@ -223,13 +238,14 @@ const ChatView = () => {
             <button 
               id="send-button"
               onClick={handleSendMessage}
+              disabled={isLoading || !inputValue.trim()}
             >
               <FontAwesomeIcon icon={faPaperPlane} />
             </button>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

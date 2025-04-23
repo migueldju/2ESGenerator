@@ -144,3 +144,12 @@
     border-radius: 4px;
     font-size: 14px;
   }
+
+  .auth-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: var(--light-bg);
+  }

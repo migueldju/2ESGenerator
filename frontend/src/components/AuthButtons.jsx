@@ -14,7 +14,7 @@ const AuthButtons = () => {
     // Check if user is logged in
     const checkLoginStatus = async () => {
       try {
-        const response = await fetch('http://localhost:5000/check-auth', {
+        const response = await fetch('/api/check-auth', {
           method: 'GET',
           credentials: 'include'
         });
@@ -36,7 +36,7 @@ const AuthButtons = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:5000/logout', {
+      const response = await fetch('/api/logout', {
         method: 'POST',
         credentials: 'include'
       });

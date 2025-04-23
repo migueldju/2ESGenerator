@@ -25,12 +25,16 @@ class EmailService:
         self.logger.info(f"Email service configured with server: {self.host}:{self.port}")
         self.logger.info(f"Email TLS: {self.use_tls}, SSL: {self.use_ssl}")
         
-        if not self.host or not self.port:
-            self.logger.warning("Email service not fully configured - missing server or port")
-        
+        # Check if email is properly configured
+        self.email_enabled = bool(self.host and self.port)
+        if not self.email_enabled:
+            self.logger.warning("Email service not fully configured - emails will be logged but not sent")
+
+    # Then modify the send_email method
     def send_email(self, to, subject, template):
         """Send an email with proper security settings"""
         try:
+            # Create email message
             msg = MIMEMultipart('alternative')
             msg['Subject'] = subject
             msg['From'] = self.sender
@@ -39,6 +43,13 @@ class EmailService:
             
             msg.attach(MIMEText(template, 'html'))
             
+            # If email is not configured, just log it
+            if not getattr(self, 'email_enabled', False):
+                self.logger.info(f"Email would be sent to {to} with subject '{subject}'")
+                self.logger.info(f"Email content: {template[:100]}...")
+                return True
+                
+            # Otherwise, send it
             context = ssl.create_default_context()
             
             if self.use_ssl:
