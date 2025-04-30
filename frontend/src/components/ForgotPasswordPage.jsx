@@ -54,9 +54,6 @@ const ForgotPasswordPage = () => {
       });
       
       const data = await response.json();
-      
-      // Even if the email doesn't exist, the API should return a success message 
-      // for security reasons (to not reveal which emails are registered)
       setSuccessMessage(data.message || 'If your email is registered, you will receive a password reset link shortly.');
     } catch (error) {
       console.error("Forgot password error:", error);

@@ -1,6 +1,3 @@
-// Update ChatView component to better handle height and layout
-// src/components/chatView.jsx
-
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';

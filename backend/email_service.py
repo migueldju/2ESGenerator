@@ -1,6 +1,7 @@
 import logging
 from flask_mail_sendgrid import MailSendGrid
 from flask_mail import Message
+import os
 
 class EmailService:
     def __init__(self, app=None):
@@ -8,6 +9,7 @@ class EmailService:
         self.sender = None
         self.mail = None
         self.email_enabled = False
+        self.frontend_url = None
         if app:
             self.init_app(app)
 
@@ -15,9 +17,11 @@ class EmailService:
         self.sender = app.config.get('MAIL_DEFAULT_SENDER')
         self.mail = MailSendGrid(app)
         self.email_enabled = bool(app.config.get('MAIL_SENDGRID_API_KEY'))
+        self.frontend_url = app.config.get('FRONTEND_URL', os.environ.get('FRONTEND_URL', 'http://localhost:5173'))
 
         self.logger.info(f"Email service configured with sender: {self.sender}")
         self.logger.info(f"Using SendGrid API key: {'Configured' if self.email_enabled else 'Not configured'}")
+        self.logger.info(f"Frontend URL for email links: {self.frontend_url}")
 
         if not self.email_enabled:
             self.logger.warning("Email service not fully configured - emails will be logged but not sent")
@@ -44,11 +48,12 @@ class EmailService:
         <html>
             <head>
                 <style>
-                    body {{ font-family: Arial, sans-serif; color: #333; line-height: 1.6; }}
+                    body {{ font-family: Arial, sans-serif; color: #000000; line-height: 1.6; }}
                     .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
                     .header {{ background-color: #004aad; color: white; text-align: center; padding: 10px; }}
                     .content {{ padding: 20px; }}
-                    .button {{ background-color: #004aad; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; }}
+                    .button {{ background-color: #004aad; color: white !important; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; }}
+                    .button-text {{ color: white !important; text-decoration: none; }}
                     .footer {{ margin-top: 20px; font-size: 12px; color: #777; }}
                 </style>
             </head>
@@ -69,10 +74,14 @@ class EmailService:
         """
 
     def send_verification_email(self, user, verification_url):
+        if not verification_url.startswith(self.frontend_url) and '/verify-email/' in verification_url:
+            token = verification_url.split('/verify-email/')[1]
+            verification_url = f"{self.frontend_url}/verify-email/{token}"
+            
         content = f"""
             <p>Thank you for registering with ESGenerator. Please verify your email by clicking below:</p>
             <p style="text-align: center;">
-                <a href="{verification_url}" class="button">Verify Email Address</a>
+                <a href="{verification_url}" class="button"><span class="button-text">Verify Email Address</span></a>
             </p>
             <p>If the button doesn't work, copy this link into your browser:</p>
             <p>{verification_url}</p>
@@ -82,10 +91,14 @@ class EmailService:
         return self.send_email(user.email, "Verify Your Email Address - ESGenerator", html)
 
     def send_password_reset_email(self, user, reset_url):
+        if not reset_url.startswith(self.frontend_url) and '/reset-password/' in reset_url:
+            token = reset_url.split('/reset-password/')[1]
+            reset_url = f"{self.frontend_url}/reset-password/{token}"
+            
         content = f"""
             <p>We received a request to reset your password. Click below to proceed:</p>
             <p style="text-align: center;">
-                <a href="{reset_url}" class="button">Reset Password</a>
+                <a href="{reset_url}" class="button"><span class="button-text">Reset Password</span></a>
             </p>
             <p>If the button doesn't work, copy this link into your browser:</p>
             <p>{reset_url}</p>

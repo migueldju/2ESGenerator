@@ -257,16 +257,12 @@ def check_session():
 @app.route('/save_content', methods=['POST'])
 @login_required
 def save_content():
-    # Add CSRF protection
     if not validate_csrf_token(request.form.get('csrf_token')):
         app.logger.warning(f"CSRF token validation failed: {request.remote_addr}")
         return jsonify({'status': 'error', 'message': 'Invalid CSRF token'}), 403
         
     content = request.form.get('content', '')
     
-    # Sanitize input if needed
-    
-    # Save to database
     document = Document(
         user_id=current_user.id,
         name=f"ESRS Report {datetime.now().strftime('%Y-%m-%d %H:%M')}",
@@ -450,8 +446,8 @@ def reset_password_page(token):
         app.logger.warning(f"Invalid password reset attempt with token: {token}")
         return jsonify({'message': 'Invalid or expired reset token'}), 400
     
-    # Return a page that allows the user to enter a new password
-    return render_template('reset_password.html', token=token, csrf_token=generate_csrf_token())
+    # Return the main index.html for React to handle
+    return send_from_directory(app.template_folder, 'index.html')
 
 @app.route('/reset-password', methods=['POST'])
 # @limiter.limit("5 per hour")
@@ -461,10 +457,8 @@ def reset_password():
     if not data or not data.get('token') or not data.get('password'):
         return jsonify({'message': 'Missing required fields'}), 400
     
-    # Validate CSRF token
-    if not validate_csrf_token(data.get('csrf_token')):
-        app.logger.warning("CSRF token validation failed in password reset")
-        return jsonify({'message': 'Invalid request'}), 403
+    # CSRF token validation is removed since React handles CSRF differently
+    # and we're using credentials: 'include' in the frontend
     
     user = User.query.filter_by(reset_token=data['token']).first()
     

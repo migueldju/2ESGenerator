@@ -2,16 +2,14 @@ import os
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-load_dotenv()
+# load_dotenv()
 
 class Config:
     """Base configuration."""
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev_key_change_this_in_production')
-    # Using MariaDB (which is a fork of MySQL) by default
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI', 'mysql+pymysql://esrs_user:esrs_password@localhost/esrs_db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # Email configuration
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.sendgrid.net')
     MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'True') == 'True'
@@ -19,24 +17,20 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME', 'apikey')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'esgeneratornoreply@gmail.com')
-    
-    # SendGrid API Key
     MAIL_SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', '')
 
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
-    
-    # Database configuration for development
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI', 'mysql+pymysql://admin:ESG@localhost/esrs_db')
-    
-    # Email configuration for development
+
+
     MAIL_SERVER = 'smtp.sendgrid.net'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
     MAIL_USERNAME = 'apikey'
-    MAIL_SENDGRID_API_KEY = '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'
-    MAIL_PASSWORD = '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'
+    MAIL_SENDGRID_API_KEY = ''
+    MAIL_PASSWORD = ''
     MAIL_DEFAULT_SENDER = 'esgeneratornoreply@gmail.com'
     EMAIL_SUPPRESS_SEND = False
 
@@ -45,27 +39,23 @@ class TestingConfig(Config):
     """Testing configuration."""
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-    # Disable email sending in testing
     EMAIL_SUPPRESS_SEND = True
     
 class ProductionConfig(Config):
     """Production configuration."""
     DEBUG = False
     # Use environment variables for production configuration
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI', 'mysql+pymysql://esrs_user:esrs_password@localhost/esrs_db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI', 'mysql+pymysql://admin:ESG@localhost/esrs_db')
     
-    # Set these from environment variables in production
     SECRET_KEY = os.environ.get('SECRET_KEY')
     MAIL_SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-    
-    # Ensure these are properly configured
+
     MAIL_SERVER = 'smtp.sendgrid.net'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
     MAIL_USERNAME = 'apikey'
     MAIL_PASSWORD = os.environ.get('SENDGRID_API_KEY')
 
-# Configuration dictionary
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
@@ -73,7 +63,6 @@ config = {
     'default': DevelopmentConfig
 }
 
-# Get the current configuration
 def get_config():
     env = os.environ.get('FLASK_ENV', 'development')
     return config.get(env, config['default'])

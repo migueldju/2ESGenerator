@@ -1,6 +1,4 @@
-2025-04-23 12:21:09,769 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 12:21:50,188 INFO: Chat message received. Session initialized: False [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:218]
-2025-04-23 12:23:14,359 ERROR: Exception on /register [POST] [in C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py:875]
+2025-04-23 21:16:26,804 ERROR: Exception on /reset-password/d633709c-974e-442f-942c-06bc0e54dc05 [GET] [in C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py:875]
 Traceback (most recent call last):
   File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -14,76 +12,52 @@ Traceback (most recent call last):
   File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py", line 317, in register
-    if User.query.filter_by(email=data['email']).first():
-       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\orm\query.py", line 2728, in first
-    return self.limit(1)._iter().first()  # type: ignore
-           ~~~~~~~~~~~~~~~~~~~^^
-  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\orm\query.py", line 2827, in _iter
-    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
-                                                  ~~~~~~~~~~~~~~~~~~~~^
-        statement,
-        ^^^^^^^^^^
-        params,
-        ^^^^^^^
-        execution_options={"_sa_orm_load_options": self.load_options},
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\orm\session.py", line 2362, in execute
-    return self._execute_internal(
-           ~~~~~~~~~~~~~~~~~~~~~~^
-        statement,
-        ^^^^^^^^^^
-    ...<4 lines>...
-        _add_event=_add_event,
-        ^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\sqlalchemy\orm\session.py", line 2235, in _execute_internal
-    bind = self.get_bind(**bind_arguments)
-  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask_sqlalchemy\session.py", line 53, in get_bind
-    engines = self._db.engines
-              ^^^^^^^^^^^^^^^^
-  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask_sqlalchemy\extension.py", line 690, in engines
-    raise RuntimeError(
-    ...<3 lines>...
-    )
-RuntimeError: The current Flask app is not registered with this 'SQLAlchemy' instance. Did you forget to call 'init_app', or did you create multiple 'SQLAlchemy' instances?
-2025-04-23 12:30:48,953 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 12:31:12,998 ERROR: Registration error: The current Flask app is not registered with this 'SQLAlchemy' instance. Did you forget to call 'init_app', or did you create multiple 'SQLAlchemy' instances? [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:356]
-2025-04-23 12:34:01,299 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 13:00:36,797 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 13:00:53,537 WARNING: Failed login attempt for email: migueldjur@gmail.com [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:386]
-2025-04-23 13:01:11,234 INFO: New user registered: Kirilak [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:352]
-2025-04-23 13:27:59,973 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 13:28:32,940 INFO: New user registered: Kirilak2 [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:359]
-2025-04-23 14:49:17,201 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 14:52:10,056 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 14:55:40,090 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 15:01:04,481 INFO: Chat message received. Session initialized: False [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:220]
-2025-04-23 15:44:03,873 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 15:44:20,490 INFO: Password reset link sent to: migueldjur@gmail.com [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:456]
-2025-04-23 15:45:00,221 INFO: New user registered: Kirilak3 [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:352]
-2025-04-23 17:41:37,171 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 17:43:53,331 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 17:44:24,301 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 17:45:48,119 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:41]
-2025-04-23 17:46:22,931 ERROR: Registration error: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on 'localhost' ([WinError 10061] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión)")
-(Background on this error at: https://sqlalche.me/e/20/e3q8) [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:342]
-2025-04-23 18:47:39,883 INFO: Chat message received. Session initialized: False [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:207]
-2025-04-23 18:47:53,114 INFO: Chat message received. Session initialized: True [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:207]
-2025-04-23 18:49:29,145 INFO: Chat message received. Session initialized: True [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:207]
-2025-04-23 18:57:01,682 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
-2025-04-23 19:56:16,707 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
-2025-04-23 19:56:37,836 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
-2025-04-23 19:57:33,104 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
-2025-04-23 19:57:42,223 INFO: Chat message received. Session initialized: False [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:206]
-2025-04-23 19:57:57,279 ERROR: Registration error: (pymysql.err.ProgrammingError) (1146, "Table 'esrs_db.users' doesn't exist")
-[SQL: SELECT users.id AS users_id, users.username AS users_username, users.email AS users_email, users.password AS users_password, users.is_verified AS users_is_verified, users.verification_token AS users_verification_token, users.reset_token AS users_reset_token, users.reset_token_expiry AS users_reset_token_expiry, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
-FROM users 
-WHERE users.email = %(email_1)s 
- LIMIT %(param_1)s]
-[parameters: {'email_1': 'mikewazowski939@gmail.com', 'param_1': 1}]
-(Background on this error at: https://sqlalche.me/e/20/f405) [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:341]
+  File "C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py", line 454, in reset_password_page
+    def reset_password():
+               ^^^^^^^^^^
+  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\jinja2\loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Miguel de Juan Urien\AppData\Local\Programs\Python\Python313\Lib\site-packages\flask\templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: reset_password.html
+2025-04-23 21:18:58,616 INFO: Chat message received. Session initialized: False [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:206]
+2025-04-23 21:29:21,926 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
+2025-04-23 21:31:44,637 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
+2025-04-23 21:32:02,786 INFO: Password reset link sent to: kshmrkirilak@gmail.com [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:438]
+2025-04-23 21:33:53,932 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
+2025-04-23 21:34:12,314 INFO: Password reset link sent to: kshmrkirilak@gmail.com [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:438]
+2025-04-23 21:34:30,405 INFO: Password reset successful for user: djkirilak2 [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:478]
+2025-04-23 21:34:38,310 ERROR: Login error: 'SecureCookieSession' object has no attribute 'regenerate' [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:390]
+2025-04-23 21:34:44,597 INFO: User logged out: djkirilak2 [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:399]
+2025-04-23 21:34:49,597 WARNING: Failed login attempt for email: kshmrkirilak@gmail.com [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:368]
+2025-04-24 10:41:09,870 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
+2025-04-24 10:41:56,951 INFO: Chat message received. Session initialized: False [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:206]
+2025-04-24 10:42:36,046 INFO: Chat message received. Session initialized: False [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:206]
+2025-04-24 10:44:57,796 INFO: New user registered: ggsgsgd [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:334]
+2025-04-24 10:46:23,700 WARNING: Failed login attempt for email: kshmrkirilak@gmail.com [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:368]
+2025-04-24 10:46:28,411 WARNING: Failed login attempt for email: kshmrkirilak@gmail.com [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:368]
+2025-04-24 10:46:47,312 INFO: Password reset link sent to: kshmrkirilak@gmail.com [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:438]
+2025-04-24 10:47:10,275 INFO: Password reset successful for user: djkirilak2 [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:478]
+2025-04-24 10:47:22,149 ERROR: Login error: 'SecureCookieSession' object has no attribute 'regenerate' [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:390]
+2025-04-24 10:56:34,574 INFO: User logged out: djkirilak2 [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:399]
+2025-04-27 22:35:14,342 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
+2025-04-27 22:35:44,815 INFO: Chat message received. Session initialized: False [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:206]
+2025-04-27 22:35:56,823 INFO: Chat message received. Session initialized: True [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:206]
+2025-04-27 22:36:37,627 INFO: Chat message received. Session initialized: True [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:206]
+2025-04-30 10:12:28,625 INFO: ESGenerator startup [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:40]
+2025-04-30 10:14:42,099 INFO: Chat message received. Session initialized: False [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:206]
+2025-04-30 10:14:50,518 INFO: Chat message received. Session initialized: True [in C:\Users\Miguel de Juan Urien\Desktop\TFG\ubu-esgenerator\backend\app.py:206]

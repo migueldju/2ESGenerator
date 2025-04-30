@@ -16,7 +16,6 @@ const LoginPage = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Check for success message from registration
     if (location.state && location.state.message) {
       setSuccessMessage(location.state.message);
     }
@@ -29,7 +28,6 @@ const LoginPage = () => {
       [name]: value
     });
     
-    // Clear error when typing
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -85,10 +83,8 @@ const LoginPage = () => {
           throw new Error(data.message || 'Login failed');
         }
         
-        // Login successful
         navigate('/');
       } else {
-        // Not JSON, log the text for debugging
         const text = await response.text();
         console.error("Received non-JSON response:", text);
         throw new Error('Server returned an unexpected response format. Please try again later.');
